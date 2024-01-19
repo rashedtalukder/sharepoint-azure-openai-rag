@@ -1,0 +1,13 @@
+name: sharepoint-doc-indexer
+channels:
+  - conda-forge
+  - defaults
+  - jupyter
+dependencies:
+  - python>=3.9, <=3.12
+  - pip
+  - ipykernel
+  - pip:
+    - -r requirements.txt
+    - -r requirements-codequality.txt
+
