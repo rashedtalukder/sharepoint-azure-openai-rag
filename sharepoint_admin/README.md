@@ -33,6 +33,8 @@ It will respond with a simple payload that has the Id of the site you searched f
 
 ## Providing Site Read Permission to the App
 
+1. Change the HTTP method to **POST**
+
 In the textbox, paste the value below and replace **SITE_ID** with the value from the previous step (without quotation marks).
 
 ```text

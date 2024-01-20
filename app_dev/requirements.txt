@@ -1,9 +1,10 @@
 requests>=2,<3
 msal>=0.6.1,<2
 python-dotenv
-azure-search-documents==11.4.0b11
-openai=~1.8.0
+azure-search-documents==11.4.0
+openai==1.8.0
 tiktoken
 python-docx
 PyPDF2
 tenacity
+semantic-kernel==0.4.5.dev0

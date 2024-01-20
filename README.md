@@ -1,6 +1,8 @@
-# Retreival Augemented Generation (RAG) w/ SharePoint Data in Azure OpenAI
+# Bring Your SharePoint Online Data in Azure OpenAI (RAG Application)
 
 This repository shows how to generate vector embeddings from SharePoint Online site's documents (PDF or Word), store them in search indexes in Azure AI Search, and use the results to formulate a response in the Azure OpenAI chat completions.
+
+This is a manual step-by-step guide and does not have production automation built in. This is meant to help understand the process of building a Retreival Augement Generate (RAG) app on SharePoint/Teams uploaded files instead of being deployment ready.
 
 ## Personas
 

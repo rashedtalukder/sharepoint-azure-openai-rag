@@ -14,7 +14,6 @@ from utils.ml_logging import get_logger
 
 logger = get_logger()
 
-
 class SharePointDataExtractor:
     """This class facilitates the extraction of data from SharePoint using Microsoft Graph API.
     It supports authentication and data retrieval from SharePoint sites, lists, and libraries.
@@ -55,18 +54,18 @@ class SharePointDataExtractor:
         """
         load_dotenv()
 
-        self.tenant_id = os.getenv("TENANT_ID")
-        self.client_id = os.getenv("CLIENT_ID")
-        self.client_secret = os.getenv("CLIENT_SECRET")
+        self.tenant_id = os.getenv("AZ_TENANT_ID")
+        self.client_id = os.getenv("AZ_CLIENT_ID")
+        self.client_secret = os.getenv("AZ_CLIENT_SECRET")
         self.authority = f"https://login.microsoftonline.com/{self.tenant_id}"
 
         # Check for any missing required environment variables
         missing_vars = [
             var_name
             for var_name, var in [
-                ("TENANT_ID", self.tenant_id),
-                ("CLIENT_ID", self.client_id),
-                ("CLIENT_SECRET", self.client_secret),
+                ("AZ_TENANT_ID", self.tenant_id),
+                ("AZ_CLIENT_ID", self.client_id),
+                ("AZ_CLIENT_SECRET", self.client_secret),
             ]
             if not var
         ]
@@ -79,7 +78,7 @@ class SharePointDataExtractor:
         # Log the success of loading each environment variable
         loaded_vars = [
             var_name
-            for var_name in ["TENANT_ID", "CLIENT_ID", "CLIENT_SECRET"]
+            for var_name in ["AZ_TENANT_ID", "AZ_CLIENT_ID", "AZ_CLIENT_SECRET"]
             if var_name not in missing_vars
         ]
         if loaded_vars:
@@ -166,7 +165,7 @@ class SharePointDataExtractor:
             response.raise_for_status()
             return response.json()
         except requests.exceptions.HTTPError as err:
-            logger.error(f"HTTP Error: {err}")
+            logger.debug(f"HTTP Error: {err}")
             raise
         except Exception as err:
             logger.error(f"Error in _make_ms_graph_request: {err}")
@@ -193,6 +192,41 @@ class SharePointDataExtractor:
                     return site_id
         except Exception as err:
             logger.error(f"Error retrieving org sites: {err}")
+            return None
+    
+    def get_site_folders( self, site_id, starting_folder_url = None, folder_list = ['/'], access_token: Optional[str] = None) -> Optional[str]:
+        """
+        Get a list of all folders in a site from Microsoft Graph API.
+        """
+        if starting_folder_url is None:
+            starting_folder_url = (
+                f'https://graph.microsoft.com/v1.0/sites/{site_id}/drive/root/children'
+            )
+        access_token = access_token or self.access_token
+
+        try:
+            if( len(folder_list) == 1 ):
+                logger.info(f"Getting a list of folders in site ${site_id}...")
+            result = self._make_ms_graph_request(starting_folder_url, access_token)
+            
+            # Check if the 'value' key is in the response
+            if 'value' not in result:
+                return folder_list
+            folders = result.get("value")
+
+            for item in folders:
+                if 'folder' in item:
+                    subfolder_url = starting_folder_url + '/' + item['name'] + '/children'
+                    subfolder_val = subfolder_url[subfolder_url.index('/drive/root')+11:].replace('/children','') + '/'
+                    logger.info(subfolder_val)
+                    folder_list.append(subfolder_val)
+                    self.get_site_folders( site_id, subfolder_url, folder_list)
+            return folder_list
+                
+        except Exception as err:
+            if err.response.status_code != 404:
+                logger.error(f"Error retrieving site folders: {err}")
+                raise
             return None
 
     def get_site_id(
