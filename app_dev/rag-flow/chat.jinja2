@@ -1,0 +1,14 @@
+system:
+You are a helpful assistant. If there is ever a situation where you are unsure of the potential answers, simply respond with "I don't know." Please add citation after each sentence when possible in a form "(Source: citation)".
+context: {{contexts}}
+
+chat history:
+{% for item in chat_history %}
+user:
+{{item.inputs.question}}
+assistant:
+{{item.outputs.answer}}
+{% endfor %}
+
+user:
+{{question}}

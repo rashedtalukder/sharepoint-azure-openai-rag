@@ -1,5 +1,13 @@
 # Building a GenAI Knowledgebase from Files in SharePoint Online
 
+## Prerequisites
+In order to contain all Python dependencies and avoid conflicts, it is highly recommended you use a conda environment or any other mechanism for an isolated virtual environment. You can download/install miniconda [here](https://docs.anaconda.com/free/miniconda/miniconda-install/).
+
+Create a new environment using the configuration provided:
+```bash
+conda env create -f environment.yml
+```
+
 ## Configuring your App
 All the configuration values that you'll use will be contained within a **.env** file. Copy the **.env.sample** file and rename it to `.env`. Then, open the file and paste the values for the environmental variables as you follow the rest of this doc.
 
@@ -10,7 +18,7 @@ Select your subscription and create a new resource group. Give the resource grou
 
 ![Create Azure OpenAI resource](images/1.png)
 
-With the resource created, it will forward you to the overview page for your new Azure OpenAI resource. Click the **Keys and Endpoint** tab in the left navigation pane. Copy the value for **KEY 1** and paste it into the **.env** file in between the quotes for the variable **AOAI_API_KEY**. Copy and paste the **Endpoint** URL into the variable **AOAI_ENDPOINT**.
+With the resource created, it will forward you to the overview page for your new Azure OpenAI resource. Click the **Keys and Endpoint** tab in the left navigation pane. Copy the value for **KEY 1** and paste it into the **.env** file in between the quotes for the variable **AZ_OAI_API_KEY**. Copy and paste the **Endpoint** URL into the variable **AZ_OAI_ENDPOINT**.
 
 #### Creating and Deploying OpenAI Models
 With the resources created, you'll next need to deploy two different models. One to generate the vectorized embeddings that will be stored in Azure AI Search indexes and the other that will perform the human chat completions.
@@ -19,7 +27,7 @@ From the Azure OpenAI resource page, click the **Model deployments** tab in the 
 
 ![Deploy Azure OpenAI models](images/2.png)
 
-In your **.env** file, paste in the values for **AOAI_EMBEDDINGS_DEPLOYMENT_NAME** and **AOAI_CHAT_DEPLOYMENT_NAME** accordingly.
+In your **.env** file, paste in the values for **AZ_OAI_EMBEDDINGS_DEPLOYMENT_NAME** and **AZ_OAI_CHAT_DEPLOYMENT_NAME** accordingly.
 
 ### Azure AI Search Service Configuration
 From your Azure Portal, go to the [Azure AI Search](https://portal.azure.com/#view/Microsoft_Azure_ProjectOxford/CognitiveServicesHub/~/CognitiveSearch) service to start creating a new resource.
@@ -28,11 +36,11 @@ Click the **Create** button and fill out the form using the same resource group 
 
 ![Create Azure AI Search resource](images/3.png)
 
-Copy and paste the **Url** value from the resource overview page to your **.env** file for the variable **SEARCH_ENDPOINT** value. Also fill in/paste the name you gave the search service for the variable **SEARCH_NAME**. You can enter any name for the **SEARCH_INDEX_NAME** variable (e.g., `sharepoint-index`).
+Copy and paste the **Url** value from the resource overview page to your **.env** file for the variable **AZ_AISEARCH_ENDPOINT** value. Also fill in/paste the name you gave the search service for the variable **AZ_AISEARCH_NAME**. You can enter any name for the **AZ_AISEARCH_INDEX_NAME** variable (e.g., `sharepoint-index`).
 
 #### Azure AI Search Service API Key
 
-To make requests to AI Search API, you'll need API keys for this example. To get the primary admin key, click the **Keys** settings tab in the left menu. Copy and paste this value for the variable **SEARCH_ADMIN_API_KEY** in the **.env** file.
+To make requests to AI Search API, you'll need API keys for this example. To get the primary admin key, click the **Keys** settings tab in the left menu. Copy and paste this value for the variable **AZ_AISEARCH_ADMIN_API_KEY** in the **.env** file.
 
 ### Registering Your App in Microsoft Entra ID
 Start by visiting **[App registration](https://portal.azure.com/#view/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/~/RegisteredApps)** management in Azure Entra ID. Click the **New registation** button and within the form, use the display name `sharepoint-doc-indexer`. Click **Register** to register the app in your single tenent.
@@ -82,4 +90,13 @@ cd app_dev
 python ingest_sp_files.py
 ```
 
-## Creating and Running a RAG App w/ Azure OpenAI
+## Creating and Running the RAG App w/ Azure OpenAI
+The app utilizes the [Prompt Flow](https://github.com/microsoft/promptflow/tree/main) SDK to perform a single test run of the app. The app will query your Azure OpenAI completions endpoint and provide additional context that it retrieved from Azure AI Search.
+
+To run the app:
+```bash
+python app.py
+```
+
+# Next steps
+You can create variants of your system prompts and create [Prompt Flow evaluations](https://microsoft.github.io/promptflow/how-to-guides/run-and-evaluate-a-flow/index.html) to run and test the performance of your LLM apps for different scenarios or inputs. You can also use additional tools such as an orchestrator to programatically provide additional capabilities. One such orchestrator is [Semantic Kernel](https://learn.microsoft.com/en-us/semantic-kernel/get-started/quick-start-guide?toc=%2Fsemantic-kernel%2Ftoc.json&tabs=python), which works easily with Prompt Flow.

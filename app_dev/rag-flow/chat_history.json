@@ -1,0 +1,10 @@
+[
+    {
+        "inputs": {
+          "chat_input": "Hi"
+        },
+        "outputs": {
+          "chat_output": "Hello! How can I assist you today?"
+        }
+    }
+]

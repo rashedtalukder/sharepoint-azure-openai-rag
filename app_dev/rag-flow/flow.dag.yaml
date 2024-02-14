@@ -1,0 +1,70 @@
+$schema: https://azuremlschemas.azureedge.net/promptflow/latest/Flow.schema.json
+environment:
+  python_requirements_txt: requirements.txt
+inputs:
+  chat_history:
+    type: list
+    is_chat_history: true
+    is_chat_input: false
+  question:
+    type: string
+    is_chat_input: true
+  chat_deployment_name:
+    type: string
+    is_chat_input: true
+  embeddings_deployment_name:
+    type: string
+    is_chat_input: false
+  search_index_name:
+    type: string
+    is_chat_input: false
+outputs:
+  chat_output:
+    type: string
+    reference: ${chat.output}
+    is_chat_output: true
+nodes:
+- name: embed_the_question
+  type: python
+  source:
+    type: package
+    tool: promptflow.tools.embedding.embedding
+  inputs:
+    connection: azure_open_ai_connection
+    deployment_name: ${inputs.embeddings_deployment_name}
+    input: ${inputs.question}
+  use_variants: false
+- name: search_ai_search_vector_index
+  type: python
+  source:
+    type: package
+    tool: promptflow_vectordb.tool.vector_db_lookup.VectorDBLookup.search
+  inputs:
+    connection: azure_ai_search_connection
+    index_name: ${inputs.search_index_name}
+    vector_field: contentVector
+    vector: ${embed_the_question.output}
+    text_field: content
+    top_k: 2
+  use_variants: false
+- name: add_context_from_search_index
+  type: python
+  source:
+    type: code
+    path: context_from_index.py
+  inputs:
+    search_result: ${search_ai_search_vector_index.output}
+- name: chat
+  type: llm
+  source:
+    type: code
+    path: chat.jinja2
+  inputs:
+    deployment_name: ${inputs.chat_deployment_name}
+    max_tokens: 256
+    temperature: 0.7
+    contexts: ${add_context_from_search_index.output}
+    chat_history: ${inputs.chat_history}
+    question: ${inputs.question}
+  connection: azure_open_ai_connection
+  api: chat

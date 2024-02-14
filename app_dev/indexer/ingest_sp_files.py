@@ -120,19 +120,19 @@ def upload_document_vectors():
     '''
     # Instantiate the Azure AI Search client
     search_client = SearchClient(
-        endpoint=os.environ["SEARCH_ENDPOINT"],
-        index_name=os.environ["SEARCH_INDEX_NAME"],
-        credential=AzureKeyCredential(os.environ["SEARCH_ADMIN_API_KEY"]),
+        endpoint=os.environ["AZ_AISEARCH_ENDPOINT"],
+        index_name=os.environ["AZ_AISEARCH_INDEX_NAME"],
+        credential=AzureKeyCredential(os.environ["AZ_AISEARCH_ADMIN_API_KEY"]),
     )
 
     # Instantiate the Azure OpenAI client
     aoai_client = AzureOpenAI(
-        api_version=os.environ["AOAI_API_VERSION"],
-        azure_endpoint=os.environ["AOAI_ENDPOINT"],
-        api_key=os.environ["AOAI_KEY"]
+        api_version=os.environ["AZ_OAI_API_VERSION"],
+        azure_endpoint=os.environ["AZ_OAI_ENDPOINT"],
+        api_key=os.environ["AZ_OAI_KEY"]
     )
 
-    embeddings_model = os.environ["AOAI_EMBEDDINGS_DEPLOYMENT_NAME"]
+    embeddings_model = os.environ["AZ_OAI_EMBEDDINGS_DEPLOYMENT_NAME"]
 
     from gbb_ai.sharepoint_data_extractor import SharePointDataExtractor
 
@@ -280,20 +280,20 @@ def create_index():
     # Set the service endpoint and API key from the environment
     # Create an SDK client
     index_client = SearchIndexClient(
-        endpoint = os.environ["SEARCH_ENDPOINT"],
-        index_name = os.environ["SEARCH_INDEX_NAME"],
-        credential = AzureKeyCredential(os.environ["SEARCH_ADMIN_API_KEY"]),
+        endpoint = os.environ["AZ_AISEARCH_ENDPOINT"],
+        index_name = os.environ["AZ_AISEARCH_INDEX_NAME"],
+        credential = AzureKeyCredential(os.environ["AZ_AISEARCH_ADMIN_API_KEY"]),
     )
 
     # Delete an existing index with the name provided in the environment variables
     try:
-        result = index_client.delete_index(os.environ["SEARCH_INDEX_NAME"])
-        print("Index", os.environ["SEARCH_INDEX_NAME"], "deleted")
+        result = index_client.delete_index(os.environ["AZ_AISEARCH_INDEX_NAME"])
+        print("Index", os.environ["AZ_AISEARCH_INDEX_NAME"], "deleted")
     except Exception as ex:
         print(ex)
 
     index = SearchIndex(
-        name=os.environ["SEARCH_INDEX_NAME"],
+        name=os.environ["AZ_AISEARCH_INDEX_NAME"],
         fields=index_fields_config(),
         scoring_profiles=[],
         suggesters=[{"name": "sg", "source_fields": ["name"]}],

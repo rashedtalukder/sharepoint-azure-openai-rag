@@ -1,4 +1,4 @@
-name: sharepoint-doc-indexer
+name: sharepoint-rag
 channels:
   - conda-forge
   - defaults
