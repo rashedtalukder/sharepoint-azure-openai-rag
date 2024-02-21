@@ -7,8 +7,8 @@ This is a manual step-by-step guide and does not have production automation buil
 ## Personas
 
 In order to use this repo, it is split into two separate personas to complete the tasks required. View the corresponding folder for your role:
-- [Application developer/data scientist](tree/main/app_dev)
-- [SharePoint administrator](tree/main/sharepoint_admin)
+- [Application developer/data scientist](app_dev/README.md)
+- [SharePoint administrator](sharepoint_admin/README.md)
 
 ## Known limitations
 
